@@ -1,0 +1,46 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+	{% include 'elements/nav.html' %}
+	<div class="page-content">
+		<div class="row">
+			<div class="col-md-2">
+				{% include 'elements/nav_second.html' %}
+			</div>
+			<div class="col-md-10">
+				<div class="row text-center">
+					{% for area in areas %}
+					<div class="col-md-6">
+						<div class="content-box-large">
+							<div class="panel-body">
+								{% for space in spaces %}
+									{% if space.area == area %}
+										<div class="col-md-6">
+											<a href="{% url 'space' space.space_tag %}">
+												<div class="dark">
+													{{ space }}
+												</div>
+											</a>
+										</div>
+									{% endif %}
+								{% endfor %}
+							</div>
+						</div>
+						<div class="blue-light">
+							<h3>{{ area.name }}</h3>
+						</div>
+					</div>
+					{% empty %}
+						<div class="col-md-12">
+							<div class="content-box-large">
+								<div class="panel-body">
+									<h1>Area Not Found</h1>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

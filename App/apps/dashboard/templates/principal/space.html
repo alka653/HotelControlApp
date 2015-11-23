@@ -1,0 +1,123 @@
+{% extends 'layout/base.html' %}
+
+{% block content_head %}
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script>
+		/*
+		call();
+		function call() {
+			space = {{ space.id }}
+			task = [];
+			$.ajax({
+				type: 'GET',
+				url: "{% url 'sensor' %}",
+				data: {'space_id': space},
+				dataType: 'json',
+				success: function(data){
+					$('div.sensor-div').remove()
+					$.each(data, function(a, b){
+						$('#data-sensor').append('<div class="col-md-4 sensor-div text-center"><div id="chart_'+b.pk+'"></div><p><div class="dark" id="sensor">'+b.name+'</div></p></div></div>');
+						chart(b.pk, b.name);
+					});
+				}
+			});
+		}*/
+		//chart();
+		//load();
+		function drawChart(){
+			{% for sensors in sensor %}
+			var jsonData = $.ajax({
+				url: "{% url 'data_sensor' %}",
+				data: {'sensor_id': {{ sensors.pk }}},
+				dataType: 'json',
+			}).done(function (results){
+				if(results != ''){
+					$('#chart_{{ sensors.pk }}').children().remove();
+					$('#chart_{{ sensors.pk }}').append('<div id="graph_{{ sensors.pk }}"></div>');
+					d_sensor = [];
+					$.each(results, function (i, row) {
+						val = [row.hour, row.value]
+						d_sensor.push(val);
+	        		});
+					var chart_data = google.visualization.arrayToDataTable(d_sensor, true);
+					var chart =  new google.visualization.AreaChart(document.getElementById('graph_{{ sensors.pk }}'));
+					chart.draw(chart_data, {
+	            		title: 'Sensor {{ sensors.name }}'
+	        		});
+				}else{
+					$('#chart_{{ sensors.pk }}').children().remove();
+					$('#chart_{{ sensors.pk }}').append('<h3>Data no found to graph</h3>');
+				}
+			});
+			/*
+			$.ajax({
+				type: 'GET',
+				url: "{% url 'data_sensor' %}",
+				data: {'sensor_id': {{ sensors.pk }}},
+				dataType: 'json',
+				success: function(data_sensor){
+					if(data_sensor != ''){
+						function drawChart(){
+							d_sensor = [];
+							$.each(data_sensor, function(c, d){
+								val = [d.hour, d.value]
+								d_sensor.push(val);
+								//chart_data.addRows(val);
+							});
+							var chart_data = google.visualization.arrayToDataTable(d_sensor, true);
+							$('#graph_{{ sensors.pk  }}').remove();
+							$('#chart_{{ sensors.pk }}').append('<div id="graph_{{ sensors.pk }}"></div>');
+							var chart = new google.visualization.AreaChart(document.getElementById('graph_{{ sensors.pk }}'));
+							var options = {
+								title: 'Sensor {{ sensors.name }}'
+							};
+							chart.draw(chart_data, options);
+						}
+					}else{
+						$('#chart_{{ sensors.pk }}').children().remove();
+						$('#chart_{{ sensors.pk }}').append('<h3>Data no found to graph</h3>');
+					}
+				}
+			});
+			*/
+			{% endfor %}
+		}
+		google.load("visualization", "1", {packages:["corechart"]});
+		google.setOnLoadCallback(drawChart);
+		setInterval(drawChart, 6000);
+	</script>
+{% endblock content_head %}
+
+{% block content %}
+	{% include 'elements/nav.html' %}
+	<div class="page-content">
+		<div class="row">
+			<div class="col-md-2">
+				{% include 'elements/nav_second.html' %}
+			</div>
+			<div class="col-md-10">
+				<div class="row">
+					<h1 class="title"><strong>{{ space.name }}</strong></h1>
+						{% for sensors in sensor %}
+						<div class="col-md-6">
+							<div class="col-md-12 text-center">
+								<div id="chart_{{ sensors.pk }}">
+									<div id="graph_{{ sensors.pk }}"></div>
+								</div>
+								<p>
+									<div class="dark" id="sensor">{{ sensors.name }}</div>
+								</p>
+							</div>
+						</div>
+						{% endfor %}
+					<div class="col-md-6">
+						<div id="chart_div"></div>
+					</div>
+					<div class="col-md-12">
+						<div id="data-sensor"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}

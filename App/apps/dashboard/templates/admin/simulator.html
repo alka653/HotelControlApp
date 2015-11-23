@@ -1,0 +1,80 @@
+{% extends 'layout/base.html' %}
+
+{% block content_head %}
+	<script>
+		$(document).ready(function(){
+			{% for sensor in sensors %}
+				var interval_{{ sensor.pk }};
+			{% endfor %}
+			function generate_number(id){
+				value = Math.round(Math.random()*(200-0)+0);
+				$('.value_'+id).remove();
+				$('.data_'+id).append('<h4 class="value_'+id+'">Value: '+value+'</h4>');
+				$.ajax({
+					url: "{% url 'send_data_sensor' %}",
+					data: {'sensor_id': id, 'value_sensor': value},
+					dataType: 'json',
+				}).done(function (results){
+					console.log(results.response);
+				});
+			}
+			$(".begin").click(function(event){
+				id = $(this).attr('id');
+				$('.begin_'+id).css('display', 'none');
+				$('.pause_'+id).css('display', 'inline');
+				{% for sensor in sensors %}
+					if(id == {{ sensor.pk }}){
+						interval_{{ sensor.pk }} = setInterval(generate_number, 3000, id);
+					}
+				{% endfor %}
+				event.preventDefault();
+			});
+			$(".pause").click(function(event){
+				id = $(this).attr('id');
+				$('.pause_'+id).css('display', 'none');
+				$('.begin_'+id).css('display', 'inline');
+				{% for sensor in sensors %}
+					if(id == {{ sensor.pk }}){
+						clearInterval(interval_{{ sensor.pk }});
+						$('.value_'+id).remove();
+					}
+				{% endfor %}
+				event.preventDefault();
+			});
+		});
+	</script>
+{% endblock content_head %}
+
+{% block content %}
+	{% include 'elements/nav.html' %}
+	<div class="page-content">
+		<div class="row">
+			<div class="col-md-2">
+				{% include 'elements/nav_second.html' %}
+			</div>
+			<div class="col-md-10">
+				<div class="row">
+					<h1 class="title"><strong>Sensor Data Simulator</strong></h1>
+					{% for sensor in sensors %}
+						<div class="col-md-4 text-center">
+							<div class="content-box-large">
+								<div class="panel-body">
+									<div class="row">
+										<p><a href="#" class="btn btn-success begin begin_{{ sensor.pk }}" id="{{ sensor.pk }}">Start</a></p>
+										<p><a href="#" class="btn btn-danger pause pause_{{ sensor.pk }}" id="{{ sensor.pk }}">Cancel</a></p>
+									</div>
+									<div class="row">
+										<div class="data_{{ sensor.pk }}"></div>
+									</div>
+								</div>
+							</div>
+							<div class="blue-light">
+								<h4>{{ sensor.name }}</h4>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock content %}
