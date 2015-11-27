@@ -1,5 +1,27 @@
 {% extends 'layout/base.html' %}
 
+{% block content_head %}
+	<script>
+	function Statespace(){
+		{% for space in spaces %}
+			var jsonData = $.ajax({
+				url: "{% url 'state_space' %}",
+				data: {'space': {{ space.pk }}},
+				dataType: 'json',
+			}).done(function (results){
+				$('.state_'+results.space_tag).removeAttr('id');
+				$('.state_'+results.space_tag).children().remove();
+				$('.state_'+results.space_tag).append('<h3>'+results.text+': '+results.value+'</h3>');
+				$('.state_'+results.space_tag).attr('id', results.id);
+				console.log(results.space_tag, results.value, results.text, results.id);
+			});
+		{% endfor %}
+	}
+	setInterval(Statespace, 6000);
+	Statespace();
+	</script>
+{% endblock content_head %}
+
 {% block content %}
 	{% include 'elements/nav.html' %}
 	<div class="page-content">
@@ -15,13 +37,14 @@
 							<div class="panel-body">
 								{% for space in spaces %}
 									{% if space.area == area %}
-										<div class="col-md-6">
-											<a href="{% url 'space' space.space_tag %}">
+										<a href="{% url 'space' space.space_tag %}">
+											<div class="col-md-6">
+												<div class="col-md-12 state_{{ space.space_tag }}"></div>
 												<div class="dark">
 													{{ space }}
 												</div>
-											</a>
-										</div>
+											</div>
+										</a>
 									{% endif %}
 								{% endfor %}
 							</div>

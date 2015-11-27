@@ -18,12 +18,26 @@
 					console.log(results.response);
 				});
 			}
+			function value_null(id){
+				value = 0;
+				$('.value_'+id).remove();
+				$('.data_'+id).append('<h4 class="value_'+id+'">Value: '+value+'</h4>');
+				$.ajax({
+					url: "{% url 'send_data_sensor' %}",
+					data: {'sensor_id': id, 'value_sensor': value},
+					dataType: 'json',
+				}).done(function (results){
+					console.log(results.response);
+				});
+			}
 			$(".begin").click(function(event){
 				id = $(this).attr('id');
 				$('.begin_'+id).css('display', 'none');
+				$('.stop_'+id).css('display', 'inline');
 				$('.pause_'+id).css('display', 'inline');
 				{% for sensor in sensors %}
 					if(id == {{ sensor.pk }}){
+						clearInterval(interval_{{ sensor.pk }});
 						interval_{{ sensor.pk }} = setInterval(generate_number, 3000, id);
 					}
 				{% endfor %}
@@ -31,6 +45,20 @@
 			});
 			$(".pause").click(function(event){
 				id = $(this).attr('id');
+				$('.stop_'+id).css('display', 'inline');
+				$('.pause_'+id).css('display', 'none');
+				$('.begin_'+id).css('display', 'inline');
+				{% for sensor in sensors %}
+					if(id == {{ sensor.pk }}){
+						clearInterval(interval_{{ sensor.pk }});
+						interval_{{ sensor.pk }} = setInterval(value_null, 3000, id);
+					}
+				{% endfor %}
+				event.preventDefault();
+			});
+			$(".stop").click(function(event){
+				id = $(this).attr('id');
+				$('.stop_'+id).css('display', 'none');
 				$('.pause_'+id).css('display', 'none');
 				$('.begin_'+id).css('display', 'inline');
 				{% for sensor in sensors %}
@@ -53,15 +81,16 @@
 				{% include 'elements/nav_second.html' %}
 			</div>
 			<div class="col-md-10">
-				<div class="row">
+				<div class="row text-center">
 					<h1 class="title"><strong>Sensor Data Simulator</strong></h1>
 					{% for sensor in sensors %}
-						<div class="col-md-4 text-center">
+						<div class="col-md-4">
 							<div class="content-box-large">
 								<div class="panel-body">
 									<div class="row">
-										<p><a href="#" class="btn btn-success begin begin_{{ sensor.pk }}" id="{{ sensor.pk }}">Start</a></p>
-										<p><a href="#" class="btn btn-danger pause pause_{{ sensor.pk }}" id="{{ sensor.pk }}">Cancel</a></p>
+										<a href="#" class="btn btn-success begin begin_{{ sensor.pk }}" id="{{ sensor.pk }}">Start</a>
+										<a href="#" class="btn btn-default pause pause_{{ sensor.pk }}" id="{{ sensor.pk }}">Pause</a>
+										<a href="#" class="btn btn-danger stop stop_{{ sensor.pk }}" id="{{ sensor.pk }}">Stop</a>
 									</div>
 									<div class="row">
 										<div class="data_{{ sensor.pk }}"></div>
@@ -69,6 +98,7 @@
 								</div>
 							</div>
 							<div class="blue-light">
+								<h5>Space {{ sensor.space.name }}</h5>
 								<h4>{{ sensor.name }}</h4>
 							</div>
 						</div>
