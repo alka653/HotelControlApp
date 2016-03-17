@@ -1,8 +1,33 @@
-<div class="sidebar content-box" style="display: block;">
-	<ul class="nav">
-		<li><a href="{% url 'home' %}"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-		{% if user.is_superuser %}
-			<li><a href="{% url 'simulator' %}"><span class="glyphicon glyphicon-random"></span> Simulator</a></li>
-		{% endif %}
-	</ul>
+<div class="col-md-3 left_col">
+	<div class="left_col scroll-view">
+		<div class="navbar nav_title" style="border: 0;">
+			<a href="{% url 'home' %}" class="site_title"><i class="fa fa-dashboard"></i> <span>HotelControl</span></a>
+		</div>
+		<div class="clearfix"></div>
+		<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+			<div class="menu_section">
+				<ul class="nav side-menu">
+					<li>
+						<a href="{% url 'home' %}">
+							<i class="fa fa-home"></i> Home
+						</a>
+					</li>
+					<!--
+					<li>
+						<a href="{% url 'graph_month' %}">
+							<i class="fa fa-bar-chart"></i> Graphs 
+						</a>
+					</li>
+					-->
+					{% if user.is_superuser %}
+					<li>
+						<a href="{% url 'simulator' %}">
+							<i class="fa fa-refresh"></i> Simulator
+						</a>
+					</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</div>
 </div>

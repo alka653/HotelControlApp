@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.contrib.auth import logout
+from django.db.models import Avg
 from .models import *
 import datetime
 import json
@@ -41,6 +42,7 @@ def data_sensor(request):
 		return HttpResponse('/')
 	return HttpResponse(json.dumps(response), content_type = 'application/json')
 
+@login_required
 def simulator(request):
 	sensors = Sensor.objects.all()
 	return render(request, 'admin/simulator.html', {'title': 'Simualtor', 'sensors': sensors})
@@ -53,7 +55,7 @@ def send_data_sensor(request):
 		sensor = Sensor.objects.get(pk = sensor_id)
 		try:
 			last_value = Value.objects.filter(sensor = sensor).latest('hour')
-			val = last_value.hour+1
+			val = last_value.hour + 1
 		except Value.DoesNotExist:
 			val = 1
 		sensor_value = Value(sensor = sensor, value = value, hour = val)
@@ -113,8 +115,21 @@ def state_space(request):
 		return HttpResponse('/')
 	return HttpResponse(json.dumps(response), content_type = 'application/json')
 
-def graph_space(request):
-	pass
+
+def graph_month(request):
+	from datetime import datetime, timedelta
+	param = {}
+	sensor_count = Sensor.objects.count()
+	value = Value.objects.filter(date__gte = datetime.now() - timedelta(days = 30)).aggregate(Avg('value'))
+	value_2 = Value.objects.filter(date__gte = datetime.now() - timedelta(days = 2)).aggregate(Avg('value'))
+	value_avg =	round((( value['value__avg'] - value_2['value__avg'] ) / value['value__avg'] ) * 100, 2)
+	if value_avg < 0:
+		param['type'] = 'red'
+		param['ord'] = 'asc'
+	else:
+		param['type'] = 'green'
+		param['ord'] = 'desc'
+	return render(request, 'principal/graph.html', {'param': param, 'value_avg': abs(value_avg), 'value_last': round(value_2['value__avg'], 2)})
 
 def logout_user(request):
 	logout(request)

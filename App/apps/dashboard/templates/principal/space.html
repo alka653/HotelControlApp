@@ -51,32 +51,33 @@
 
 {% block content %}
 	{% include 'elements/nav.html' %}
-	<div class="page-content">
-		<div class="row">
-			<div class="col-md-2">
-				{% include 'elements/nav_second.html' %}
-			</div>
-			<div class="col-md-10">
-				<h1 class="title"><strong>{{ space.name }}</strong></h1>
-				<div class="col-md-12">
-					<h3>Graphic data from sensors</h3>
-						{% for sensors in sensor %}
-						<div class="col-md-6">
-							<div class="col-md-12 text-center">
-								<div id="chart_{{ sensors.pk }}">
-									<div id="graph_{{ sensors.pk }}"></div>
-								</div>
-								<div class="dark" id="sensor">{{ sensors.name }}</div>
-							</div>
-						</div>
-						{% endfor %}
-					<div class="col-md-6">
-						<div id="chart_div"></div>
-					</div>
-					<div class="col-md-12">
-						<div id="data-sensor"></div>
+	<div class="right_col" role="main">
+		<div class="">
+			<div class="row">
+				<div class="page-title">
+					<div class="title_left">
+						<h3>{{ space.name }}</h3>
 					</div>
 				</div>
+			</div>
+			<div class="row">
+				{% for sensors in sensor %}
+				<div class="col-md-6 col-sm-6 col-xs-12">
+					<div class="x_panel">
+						<div class="x_title">
+							<h2>{{ sensors.name }}</h2>
+							<div class="clearfix"></div>
+						</div>
+						<div class="x_content">
+							<div id="data-sensor"></div>
+							<div id="chart_{{ sensors.pk }}">
+								<div id="graph_{{ sensors.pk }}"></div>
+							</div>
+							<div id="chart_div"></div>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
 			</div>
 		</div>
 	</div>
