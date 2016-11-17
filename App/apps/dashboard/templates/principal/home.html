@@ -29,7 +29,7 @@
 			<div class="row">
 				<div class="page-title">
 					<div class="title_left">
-						<h3>Welcome to Dashboard</h3>
+						<h3>Bienvenido <a href="{% url 'add-room' %}" class="btn btn-success open-modal" data-toggle="modal" data-target="#Modal">Agregar Salón</a></h3>
 					</div>
 				</div>
 			</div>
@@ -39,7 +39,7 @@
 					<div class="col-md-6 col-sm-6 col-xs-12">
 						<div class="x_panel">
 							<div class="x_title">
-								<h2>{{ area.name }}</h2>
+								<h2>{{ area.name }} <a href="{% url 'add-area' area.pk %}" class="btn btn-primary open-modal" data-toggle="modal" data-target="#Modal">Agregar área</a></h2>
 								<div class="clearfix"></div>
 							</div>
 							<div class="x_content">

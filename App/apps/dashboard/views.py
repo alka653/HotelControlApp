@@ -1,12 +1,16 @@
+# -*- encoding: utf-8 -*-
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, render_to_response
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.views.generic import CreateView
 from django.template import RequestContext
 from django.contrib.auth import logout
+from django.utils.text import slugify
 from django.db.models import Avg
 from .models import *
+from .forms import *
 import datetime
 import json
 
@@ -134,3 +138,54 @@ def graph_month(request):
 def logout_user(request):
 	logout(request)
 	return HttpResponseRedirect('/')
+
+class RoomCreateView(CreateView):
+	template_name = 'principal/form_general.html'
+	form_class = RoomForm
+
+	def get_context_data(self, **kwargs):
+		context = super(RoomCreateView, self).get_context_data(**kwargs)
+		context['title'] = 'Agregar salon'
+		context['url'] = reverse('add-room')
+		return context
+
+	def get_success_url(self):
+		return reverse('home')
+
+class AreaCreateView(CreateView):
+	template_name = 'principal/form_general.html'
+	form_class = AreaForm
+
+	def get_context_data(self, **kwargs):
+		context = super(AreaCreateView, self).get_context_data(**kwargs)
+		context['title'] = 'Agregar area'
+		context['url'] = reverse('add-area', kwargs = {'pk': self.kwargs['pk']})
+		return context
+
+	def form_valid(self, form):
+		form.instance.area = Area.objects.get(pk = self.kwargs['pk'])
+		data = form.save(commit = False)
+		data.space_tag = slugify(data.name)
+		data.save()
+		return super(AreaCreateView, self).form_valid(form)
+
+	def get_success_url(self):
+		return reverse('home')
+
+class SensorCreateView(CreateView):
+	template_name = 'principal/form_general.html'
+	form_class = SensorForm
+
+	def get_context_data(self, **kwargs):
+		context = super(SensorCreateView, self).get_context_data(**kwargs)
+		context['title'] = 'Agregar sensor'
+		context['url'] = reverse('add-sensor', kwargs = {'pk': self.kwargs['pk']})
+		return context
+
+	def form_valid(self, form):
+		form.instance.space = Space.objects.get(pk = self.kwargs['pk'])
+		form.save()
+		return super(SensorCreateView, self).form_valid(form)
+
+	def get_success_url(self):
+		return reverse('space', kwargs = {'space_tag': Space.objects.get(pk = self.kwargs['pk']).space_tag})

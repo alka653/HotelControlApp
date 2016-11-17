@@ -1,0 +1,23 @@
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">{{ title }}</h4>
+		</div>
+		<form role="form" action="{{ url }}" method="POST">
+			{% csrf_token %}
+			<div class="modal-body">
+				{% for forms in form %}
+					<div class="form-group">
+						<label>{{ forms.label }}</label>
+						{{ forms }}
+					</div>
+				{% endfor %}
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+				<input type="submit" value="Guardar" class="btn btn-success"/>
+			</div>
+		</form>
+	</div>
+</div>

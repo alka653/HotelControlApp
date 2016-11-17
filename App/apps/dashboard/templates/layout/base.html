@@ -11,6 +11,7 @@
 		<link href="{% static 'css/styles.css' %}" rel="stylesheet">
 		<link href="{% static 'css/icheck/flat/green.css' %}" rel="stylesheet">
 		<link href="{% static 'css/select/select2.min.css' %}" rel="stylesheet">
+		<link rel="stylesheet" href="{% static 'css/switchery/switchery.min.css' %}" />
 		<script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>
 		<script src="{% static 'js/bootstrap.min.js' %}"></script>
 		{% block content_head %}{% endblock content_head %}
@@ -22,10 +23,20 @@
 				{% block content %}{% endblock content %}
 			</div>
 		</div>
+		<div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"></div>
 		<script src="{% static 'js/icheck/icheck.min.js' %}"></script>
 		<script src="{% static 'js/select/select2.full.js' %}"></script>
 		<script src="{% static 'js/nicescroll/jquery.nicescroll.min.js' %}"></script>
 		<script src="{% static 'js/custom.js' %}"></script>
-		<link rel="stylesheet" href="{% static 'css/switchery/switchery.min.css' %}" />
+		<script>
+			$(document).on("click", ".open-modal", function(e){
+				$('#Modal').load($(this).attr('href'),function(){
+					$('#Modal').modal({
+						show:true
+					});
+				});
+				return false;
+			});
+		</script>
 	</body>
 </html>
